@@ -9,7 +9,8 @@ ExecStartPre=/bin/mkdir -p %h/photo-app-data/uploads
 ExecStart=/nix/store/$(nix path-info .#default --json | grep -o '/nix/store/[^"]*')/bin/photo-app
 Restart=on-failure
 RestartSec=10s
-Environment="SECRET_KEY=your-secret-key-here"
+# IMPORTANT: Replace with a secure random key! Generate with: python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+Environment="SECRET_KEY=CHANGE-THIS-IMMEDIATELY-IN-PRODUCTION"
 Environment="PHOTO_APP_DATA_DIR=%h/photo-app-data"
 
 # Security settings

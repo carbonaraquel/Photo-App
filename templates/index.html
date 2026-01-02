@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Photo-App{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Welcome to Photo-App! 📸</h2>
+    <p style="margin: 1.5rem 0;">
+        Photo-App is a collaborative platform where groups can share photos from events. 
+        Create events, invite friends, and share memories together!
+    </p>
+    
+    <h3 style="margin-top: 2rem;">Features:</h3>
+    <ul style="margin: 1rem 0 2rem 2rem; line-height: 2;">
+        <li>Create and join events with your profile</li>
+        <li>Upload photos to events you're a member of</li>
+        <li>Download all photos from an event (excluding your own uploads)</li>
+        <li>Simple and intuitive interface</li>
+    </ul>
+    
+    {% if not current_user.is_authenticated %}
+        <div style="display: flex; gap: 1rem;">
+            <a href="{{ url_for('register') }}" class="btn btn-success">Get Started</a>
+            <a href="{{ url_for('login') }}" class="btn">Login</a>
+        </div>
+    {% else %}
+        <a href="{{ url_for('events') }}" class="btn">View Events</a>
+    {% endif %}
+</div>
+{% endblock %}

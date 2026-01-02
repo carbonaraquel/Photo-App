@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Photos - {{ event.name }} - Photo-App{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 700px; margin: 0 auto;">
+    <h2>Upload Photos to {{ event.name }}</h2>
+    
+    <form method="POST" action="{{ url_for('upload_photo', event_id=event.id) }}" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="photos">Select Photos *</label>
+            <input type="file" id="photos" name="photos" accept="image/*" multiple required>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                Allowed formats: PNG, JPG, JPEG, GIF (max 16MB per file)
+            </p>
+        </div>
+        
+        <button type="submit" class="btn btn-success">Upload Photos</button>
+        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn" style="margin-left: 1rem;">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,3 +1,9 @@
+# Photo-App specific
+uploads/
+*.db
+*.sqlite
+*.sqlite3
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

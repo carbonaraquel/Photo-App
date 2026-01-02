@@ -1,0 +1,20 @@
+[Unit]
+Description=Photo-App Web Application
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/photo-app-data
+ExecStartPre=/bin/mkdir -p %h/photo-app-data/uploads
+ExecStart=/nix/store/$(nix path-info .#default --json | grep -o '/nix/store/[^"]*')/bin/photo-app
+Restart=on-failure
+RestartSec=10s
+Environment="SECRET_KEY=your-secret-key-here"
+Environment="PHOTO_APP_DATA_DIR=%h/photo-app-data"
+
+# Security settings
+PrivateTmp=yes
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=default.target

@@ -9,6 +9,7 @@ A web application that allows groups of people to upload and share photos at eve
 - 📸 **Photo Upload**: Upload multiple photos to events you're a member of
 - 📥 **Smart Download**: Download all photos from an event, excluding your own uploads
 - 🔒 **Authentication**: Secure login system to protect your data
+- 🔧 **Systemd Service**: NixOS module with systemd service for production deployment
 
 ## Requirements
 
@@ -102,11 +103,16 @@ python app.py
 
 ```
 Photo-App/
-├── app.py                 # Main Flask application
-├── models.py             # Database models (User, Event, Photo)
-├── requirements.txt      # Python dependencies
-├── flake.nix            # Nix Flake configuration
-├── templates/           # HTML templates
+├── app.py                    # Main Flask application
+├── models.py                 # Database models (User, Event, Photo)
+├── requirements.txt          # Python dependencies
+├── flake.nix                 # Nix Flake configuration
+├── flake.lock                # Nix Flake lock file
+├── SYSTEMD.md                # Systemd service documentation
+├── nixos-module-example.nix  # Example NixOS configuration
+├── photo-app.service         # Systemd user service file
+├── test-systemd-service.sh   # Systemd service test script
+├── templates/                # HTML templates
 │   ├── base.html
 │   ├── index.html
 │   ├── login.html
@@ -115,26 +121,47 @@ Photo-App/
 │   ├── event_detail.html
 │   ├── create_event.html
 │   └── upload_photo.html
-├── uploads/             # Directory for uploaded photos (created automatically)
-└── photo_app.db        # SQLite database (created automatically)
+├── uploads/                  # Directory for uploaded photos (created automatically)
+└── photo_app.db             # SQLite database (created automatically)
 ```
 
 ## Technical Details
 
 - **Backend**: Flask (Python 3)
 - **Database**: SQLite with SQLAlchemy ORM
-- **Authentication**: Flask-Login
+- **Authentication**: Flask-Login with CSRF protection
 - **Password Security**: Werkzeug password hashing
 - **File Handling**: Secure file uploads with UUID-based filenames
 - **Package Management**: Nix Flake for reproducible builds
+- **Deployment**: NixOS module with systemd service
+
+## Systemd Service (Production Deployment)
+
+Photo-App includes a NixOS module with systemd service for production deployment. See [SYSTEMD.md](SYSTEMD.md) for detailed documentation.
+
+**Quick start for NixOS:**
+```nix
+services.photo-app = {
+  enable = true;
+  host = "0.0.0.0";
+  port = 5000;
+  dataDir = "/var/lib/photo-app";
+};
+```
+
+**For non-NixOS systems with systemd:**
+See [SYSTEMD.md](SYSTEMD.md) for user service setup instructions.
 
 ## Security Considerations
 
 - Passwords are hashed using Werkzeug's secure password hashing
+- CSRF protection on all forms using Flask-WTF
 - File uploads are limited to specific image formats
+- Path traversal protection on file access
 - Uploaded files are renamed with UUIDs to prevent collisions
 - Users can only access events they're members of
 - Maximum file upload size is 16MB
+- Systemd service runs with security hardening options
 
 ## Contributing
 

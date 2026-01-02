@@ -3,6 +3,7 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_wtf.csrf import CSRFProtect
 from werkzeug.utils import secure_filename
 from models import db, User, Event, Photo
 import uuid
@@ -10,7 +11,7 @@ from io import BytesIO
 import zipfile
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'dev-secret-key-change-in-production'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///photo_app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -21,6 +22,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 # Initialize extensions
 db.init_app(app)
+csrf = CSRFProtect(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -235,7 +237,25 @@ def view_photo(photo_id):
         return redirect(url_for('events'))
     
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], photo.filename)
-    return send_file(file_path, mimetype='image/jpeg')
+    
+    # Validate file path is within upload folder (prevent path traversal)
+    upload_folder = os.path.abspath(app.config['UPLOAD_FOLDER'])
+    abs_file_path = os.path.abspath(file_path)
+    if not abs_file_path.startswith(upload_folder):
+        flash('Invalid file path', 'error')
+        return redirect(url_for('events'))
+    
+    # Determine MIME type based on file extension
+    extension = photo.filename.rsplit('.', 1)[1].lower() if '.' in photo.filename else ''
+    mime_types = {
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif'
+    }
+    mimetype = mime_types.get(extension, 'image/jpeg')
+    
+    return send_file(abs_file_path, mimetype=mimetype)
 
 
 @app.route('/event/<int:event_id>/download')
@@ -261,12 +281,17 @@ def download_event_photos(event_id):
     
     # Create zip file in memory
     memory_file = BytesIO()
+    upload_folder = os.path.abspath(app.config['UPLOAD_FOLDER'])
+    
     with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
         for photo in photos:
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], photo.filename)
-            if os.path.exists(file_path):
+            abs_file_path = os.path.abspath(file_path)
+            
+            # Validate file path is within upload folder (prevent path traversal)
+            if abs_file_path.startswith(upload_folder) and os.path.exists(abs_file_path):
                 # Add file to zip with original filename
-                zf.write(file_path, photo.original_filename)
+                zf.write(abs_file_path, photo.original_filename)
     
     memory_file.seek(0)
     

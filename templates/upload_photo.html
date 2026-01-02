@@ -7,6 +7,7 @@
     <h2>Upload Photos to {{ event.name }}</h2>
     
     <form method="POST" action="{{ url_for('upload_photo', event_id=event.id) }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="form-group">
             <label for="photos">Select Photos *</label>
             <input type="file" id="photos" name="photos" accept="image/*" multiple required>

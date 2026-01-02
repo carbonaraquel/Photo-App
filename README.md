@@ -10,6 +10,7 @@ A web application that allows groups of people to upload and share photos at eve
 - 📥 **Smart Download**: Download all photos from an event, excluding your own uploads
 - 🔒 **Authentication**: Secure login system to protect your data
 - 🔧 **Systemd Service**: NixOS module with systemd service for production deployment
+- 📱 **Mobile Responsive**: Fully optimized for mobile devices with touch-friendly interface
 
 ## Requirements
 
@@ -151,6 +152,17 @@ services.photo-app = {
 
 **For non-NixOS systems with systemd:**
 See [SYSTEMD.md](SYSTEMD.md) for user service setup instructions.
+
+## Mobile Support
+
+Photo-App is fully responsive and optimized for mobile devices. See [MOBILE.md](MOBILE.md) for details.
+
+**Mobile Features:**
+- Responsive design from 320px to 1920px+
+- Touch-optimized interface (44px minimum touch targets)
+- Mobile-friendly navigation and forms
+- No horizontal scrolling
+- Fast, lightweight CSS (no external frameworks)
 
 ## Security Considerations
 
